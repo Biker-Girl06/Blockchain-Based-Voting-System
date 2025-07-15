@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      margin: 0; font-family: Arial, sans-serif; display: flex; height: 100vh;
+    }
+    nav {
+      width: 220px; background: #0d6efd; color: white; display: flex; flex-direction: column;
+    }
+    nav h2 {
+      text-align: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    nav a {
+      color: white; text-decoration: none; padding: 15px 20px; display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .main-content {
+      flex: 1; padding: 40px; background: #f4f4f4; overflow-y: auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block; margin-bottom: 5px; font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px; background: #0d6efd; border: none; color: white; border-radius: 5px; cursor: pointer;
+    }
+
+    button:hover {
+      background: #0b5ed7;
+    }
+
+    .candidate-list {
+      margin-top: 15px;
+      padding-left: 20px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h2>Admin Panel</h2>
+    <a href="#" onclick="showCreateElection()">Create Election</a>
+    <a href="#" onclick="showElectionDetails()">Election Details</a>
+    <a href="#">Candidates</a>
+    <a href="#" onclick="showAddCandidate()">Add Candidates</a>
+    <a href="#">Settings</a>
+  </nav>
+
+  <div class="main-content" id="mainContent">
+    <!-- Default view: Create Election -->
+    <h1>Create New Election</h1>
+    <form id="electionForm">
+      <div class="form-group">
+        <label for="electionName">Election Name</label>
+        <input type="text" id="electionName" required>
+      </div>
+      <div class="form-group">
+        <label for="electionDate">Election Date</label>
+        <input type="date" id="electionDate" required>
+      </div>
+      <div class="form-group">
+        <label for="description">Election Description</label>
+        <textarea id="description" rows="4" required></textarea>
+      </div>
+      <button type="submit">Create Election</button>
+    </form>
+  </div>
+
+  <script>
+    let electionData = null;
+    const candidateList = [];
+
+    function showCreateElection() {
+      document.getElementById("mainContent").innerHTML = `
+        <h1>Create New Election</h1>
+        <form id="electionForm">
+          <div class="form-group">
+            <label for="electionName">Election Name</label>
+            <input type="text" id="electionName" required>
+          </div>
+          <div class="form-group">
+            <label for="electionDate">Election Date</label>
+            <input type="date" id="electionDate" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Election Description</label>
+            <textarea id="description" rows="4" required></textarea>
+          </div>
+          <button type="submit">Create Election</button>
+        </form>
+      `;
+
+      document.getElementById("electionForm").onsubmit = function(e) {
+        e.preventDefault();
+        electionData = {
+          name: document.getElementById("electionName").value,
+          date: document.getElementById("electionDate").value,
+          description: document.getElementById("description").value
+        };
+        alert("Election Created!");
+        showCreateElection();
+      };
+    }
+
+    function showElectionDetails() {
+      if (!electionData) {
+        document.getElementById("mainContent").innerHTML = "<h2>No election created yet.</h2><button onclick='showCreateElection()'>Back</button>";
+        return;
+      }
+
+      let candidateItems = candidateList.length > 0
+        ? "<ul class='candidate-list'>" + candidateList.map(c => `<li><strong>${c.name}</strong> - ${c.party}</li>`).join("") + "</ul>"
+        : "<p>No candidates added yet.</p>";
+
+      document.getElementById("mainContent").innerHTML = `
+        <h1>Election Schedule</h1>
+        <p><strong>Name:</strong> ${electionData.name}</p>
+        <p><strong>Date:</strong> ${electionData.date}</p>
+        <p><strong>Description:</strong> ${electionData.description}</p>
+        <h3>List of Candidates</h3>
+        ${candidateItems}
+        <br><button onclick="showCreateElection()">Back</button>
+      `;
+    }
+
+    function showAddCandidate() {
+      document.getElementById("mainContent").innerHTML = `
+        <h1>Add Candidate</h1>
+        <form id="candidateForm">
+          <div class="form-group">
+            <label for="candName">Name</label>
+            <input type="text" id="candName" required>
+          </div>
+          <div class="form-group">
+            <label for="aadhaar">Aadhaar Number</label>
+            <input type="text" id="aadhaar" required>
+            <div class="error" id="aadhaarError"></div>
+          </div>
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" required>
+          </div>
+          <div class="form-group">
+            <label for="party">Party</label>
+            <input type="text" id="party" required>
+          </div>
+          <div class="form-group">
+            <label for="qualification">Qualification</label>
+            <input type="text" id="qualification" required>
+          </div>
+          <button type="submit">Add</button>
+          <button type="button" onclick="showCreateElection()" style="margin-left:10px;">Back</button>
+        </form>
+      `;
+
+      document.getElementById("candidateForm").onsubmit = function(e) {
+        e.preventDefault();
+        const aadhaar = document.getElementById("aadhaar").value.trim();
+        const exists = candidateList.some(c => c.aadhaar === aadhaar);
